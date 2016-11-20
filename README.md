@@ -1,29 +1,29 @@
 # Javascript-course
 
-Syntax Parsers: reads the code and tells what it does and if it's valid (=> translate to the computer)
+*Syntax Parsers*: reads the code and tells what it does and if it's valid (=> translate to the computer)
 
-Execution contexts : a wrapper to help manage the code that is running (lots of lexical environment running, which one is currently running)
+*Execution contexts* : a wrapper to help manage the code that is running (lots of lexical environment running, which one is currently running)
 
-lexical environment : where something sits physically in the code you write
+*Lexical environment* : where something sits physically in the code you write
 
-name/value pair: name which maps to a unique value, 1 name to a given context but can be several same name in differnt context.
+*name/value pair*: name which maps to a unique value, 1 name to a given context but can be several same name in different context.
 
-Object : a collection of name/value pairs
+*Object* : a collection of name/value pairs
 
-The global environment & global object:
+## The global environment & global object:
 => accessible from everywhere.
 execution contexts create :
-- global object (windows) = in the global context (not inside a function)
-- 'this' -> windows
-- your code
-- outer environment
+* global object (windows) = in the global context (not inside a function)
+* 'this' -> windows
+* your code
+* outer environment
 
-Execution context => Creation and Hoisting
+Execution context => Creation and *Hoisting*
 
-phase 1 : creation phase
+### phase 1 : creation phase
 Global Object + this + outer environment + Setup memory space for variables and functions (Hoisting)
 
-Hoisting : before the code is executed the engine create in memory all the variables, functions and objects
+*Hoisting* : before the code is executed the engine create in memory all the variables, functions and objects
 
 !!! the variables are created but not assigned so the value is 'undefined' until the code executes. (Never rely on hoisting always call after the definition)
 
@@ -32,79 +32,96 @@ is a special value in JS (if a===undefined) => valid
 
 !!! never do a=undefined
 
-Phase 2: execution phase =. runs the code line by line.
+### Phase 2: execution phase => runs the code line by line.
 
-Single threaded => one command at the time
-Synchronous Execution => one at the time and in order of appearance.
+*Single threaded* => one command at the time
+*Synchronous Execution* => one at the time and in order of appearance.
 
 Function invocation :running a function, use ()
 
-```
-function b() {
+```javascript
+function b() { // b() execution context
 }      
 
-function a() {
-  b();
+function a() {  // a() execution context
+  b();          
 }           
 
-a();
+a(); // Global Execution context
 ```                                           
 
 !!! Every function create a new execution context!
+```javascript
+function b(){ // when executed b()EC myVar -> undefined
+  var myVar;
+}                                               
 
-function b() { var myVar; }                                               Stack
-function a() { var myVar=2; b();} -->          b()              context 3 myVar=undefined
-var myVar = 1;
-a(); --------------------------------------->          a()              context 2  myVar=2
-                                                      Global Execution   context 1  myVar=1
+function a(){ // when executed a()EC : myVar -> 2
+  var myVar=2;
+  b();
+}   
 
+var myVar = 1; // Global EC : myVar -> 1
+a();
+```
 myVar is always different!
 
-function b() { log(myVar); }        // => 1                           Stack
-function a() { var myVar=2; b();} -->          b()              context 3 myVar=undefined
+```javascript
+function b(){
+  console.log(myVar);  // 1
+}       
+
+function a(){
+  var myVar=2;
+  b();
+}
+
 var myVar = 1;
-a(); --------------------------------------->          a()              context 2  myVar=2
-                                                      Global Execution   context 1  myVar=1
+a();  
+```
 
-Here console.log(myVar); display 1 because b execution context doesnt have a definition of myVar so JS will look in the outer Environment.
-The outer environment is link to where a function is written lexically. Here B is written in the Global Environment so the outer environment is going to myVar=1;
-This is the scope chain.
+Here console.log(myVar); display 1 because b execution context does'nt have a definition of myVar so JS will look in the outer Environment.
+*The outer environment* is link to where a function is written lexically. Here B is written in the Global Environment so the outer environment is going to myVar=1;
+This is the *scope chain*.
 
-Scope: where a variable is available in your code
+*Scope*: where a variable is available in your code
 
-Asynchronous callback: More than one at the time
+*Asynchronous callback*: More than one at the time
 
-In the browser there is Rendering engine + JS Engine + HTTP Request
+###How the browser works:
+In the browser there is *Rendering engine* + *JS Engine* + *HTTP Request*
 
-Execution context stack : Global --> a() --> b()
-Event Queue : Click --> HTTP Request --> ...
+*Execution context stack* : Global --> a() --> b()
+*Event Queue* : Click --> HTTP Request --> ...
 
 When the stack is done go to look to the event queue and start a new stack.
 
-Dynamic typing: You don't tell the tyoe if data a variable hold
+*Dynamic typing*: You don't tell the type if data a variable hold
 
-Primitives types : a type that represents a single value and not an object (which is a collection)
+*Primitives types* : a type that represents a single value and not an object (which is a collection) : `undefined`, `null`, `boolean`, `number`, `string`, `symbol`(es6)
 
-undefined, null, boolean, number, string, symbol(es6)
+*Operator precedence and association* : priority and which sense to associate (from the left or the right)
 
-Operator precedence and association : priority and which sense to associate (from the left or the right)
+*Coercion*: Converting a value from on type to another
 
-Coercion: Converting a value from on type to another
+`undefined`, `null`, `''`, `0` will return false as boolean coercion
 
-undefined, null, '', 0 will return false as boolean coercion
+### Objects and functions
+*function* : *properties*(primitives or objects) + *methods*(function)
 
-Objects and functions
-properties(primitives or objects) + method(function)
+*object literal*: `var person = {};`
 
-object literal: var person = {};
-
-!!!!! Functions are object
+####!!!!! Functions are object
 so everything we can do with object we can do with function + invocable()
 
-Function expressions : a unit of code that results in a value => var a = 3 or a===3 ...
+*Function expressions* : a unit of code that results in a value => `var a = 3` or `a===3`
 
-Function statements : if(exp)
-function greet(){  console.log('hi');  } => statement, doesn't result in a value
+*Function statements* : `if(exp)`
+```javascript
+function greet(){  
+  console.log('hi');  
+  } // statement, doesn't result in a value
+```  
 
 var anonymousGreet = function() { console.log('hi');  }  => function expression result in a value because anonymousGreet(); returns 'hi' (here we have an anonymous function)
 
