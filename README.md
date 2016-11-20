@@ -120,110 +120,209 @@ so everything we can do with object we can do with function + invocable()
 ```javascript
 function greet(){  
   console.log('hi');  
-  } // statement, doesn't result in a value
-```  
+} // statement, doesn't result in a value
 
-var anonymousGreet = function() { console.log('hi');  }  => function expression result in a value because anonymousGreet(); returns 'hi' (here we have an anonymous function)
+// function expression result in a value because anonymousGreet(); returns 'hi' (here // we have an anonymous function)
+var anonymousGreet = function() {
+  console.log('hi');  
+}
+```
 
+### Functional programming
+```javascript
+// function expression pass to a function because functions are objects
 function log(a){
-     a();
+  a();
 }
 
 log(function(){
-    console.log('hi')     // function expression pass to a function because functions                                   //  are objects
+    console.log('hi')     
 });
+```
 
-This is functional programming
+### JS memory
+A *primitive is pass by Value* and *object are pass by Reference* except when a new Object is assign to a variable (reference means no copy of the object point to the same spot in memory)
 
-A primitive is pass by Value and object are pass by Reference except when a new Object is assign to a variable (reference means no copy of the object point to the same spot in memory)
+### `this`
+During phase 1 when execution context is created the `this` key word is created pointing to different object depending on how the function is invoked.
+Everytimes a function is invoked a new Environment context is created.
 
-During phase 1 when execution context is created the 'this' key word is created pointing to different object depending on how the function is invoked.
-Everytimes a function is invoked a new Environment context is created.js
-
+```javascript
 function foo(){
-   console.log(this);
+  console.log(this);
 }
 
 var bar = function(){
-   console.log(this);
+  console.log(this);
 }
 
 foo();  //windows
 bar();   //windows
+```
 
-Here 3 execution context are created so 3 this but there are pointing to the same spot because foo and bar are called from the global context (this -> windows)
+Here 3 execution context are created so 3 `this` but there are pointing to the same spot because `foo` and `bar` are called from the global context (`this` -> windows)
 
+```javascript
 var c = {
    name:'huhu',
    log: function(){
-      console.log(this);
+      console.log(this);  
    }
 }
 
-c.log() // Object {name: "huhu"} because log() which contains this is called from c execution context so this-> c
+c.log() // Object {name: "huhu"}
+```
 
+Because `log()` which contains `this` is called from `c` execution context so `this`-> `c`
+
+```javascript
 var c = {
    name:'huhu',
    log: function(){
-      var setname = function(newName){
+      var setName = function(newName){
           this.name = newName; //undefined in c and global context
       }
-      setname('haha');
+      setName('haha');
       console.log(this);
    }
 }
 
 c.log();  // Object {name: "huhu"} and no Object {name: "haha"} why?
-Because the this in the setname point to the global context and not from c.
+```
+Because the `this` in the `setName` point to the global context and not from `c`.
 
-A pattern to go around is to do var self = this; and then use self.name
+A pattern to go around is to do ```var self = this;``` and then use `self.name`
 
-Arrays are collection of anything
+###Arrays are collection of anything
+```
 var arr=[];
+```
 
-During Phase 1 creation as well of 'arguments' (arrays of parameters passed to a function, keyword in JS)
+During Phase 1 creation, as well, of `arguments` (arrays of parameters passed to a function, keyword in JS)
 
+```javascript
 function greet(firstname, lastname, langauge){
     console.log(arguments) // [values of the arguments in an array]
 }
+```
 
-IIFE : Immediately Invoked Function Expression
+### IIFE : Immediately Invoked Function Expression
 
-function greet(name){ ... }   //Function statement
+```javascript
+
+// function statement
+function greet(name){
+  ...
+}
+
 greet('huhu');
+```
 
-var greet = function() { ... }  // Function expression (put in memory on the fly                                                     // during execution)
+```javascript
+// Function expression (put in memory on the fly during execution)
+var greet = function() {
+  ...
+}
+
 greet();
+```
 
+```javascript
+// IIFE invoke the function immediately after defining
+var greet = function() {
+  ...
+}();
 
-var greet = function() {...} (); // IIFE invoke the function immediately after defining
-
+// anonymous IIFE
 (function(name){
    var greeting ='hi';
     console.log(greeting + name);
 }());
+```
 
-without () around the function doens't compile (trick the syntax parser)
-It is very powerful to encapsulate variable, here greeting is outside the global context so the global context won't be interfered by other code.
-Pattern to use the global context inside your code without interfering.
+without `()` around the function doens't compile (trick the syntax parser)
+#### It is very powerful to encapsulate variable, here `greeting` is outside the global context so the global context won't be interfered this code.
+
+#### Pattern to use the global context inside your code without interfering.
+
+```javascript
+// windows is the global object from the browser environment
 
 (function (global,...){
       ...
 }(windows,...))
+```
 
-Closure:
+### Closure:
 
-function greet(whatToSay){   //return a function
-     return function(name){
-               console.log(whatToSay + name);
-      }
+```javascript
+function greet(whatToSay){
+  return function(name){  //return a function
+    console.log(whatToSay + name);
+  }
 }
 
 greet('hi')('tony');
 
 var sayHi = greet('hi');
-sayHi('Tony');    // How does sayHi knows the value of whatToSay here?
+sayHi('Tony');    // ????
+```
+How does `sayHi` knows the value of `whatToSay` here?
+=> because of *closure*. It's a feature of JS which allow to do nice patterns
 
-=> because of closure. It's a feature of JS which allow to do nice patterns
+## TODO put schema closure here
 
-/* TODO put schema closure here  */
+```javascript
+function buildFunctions(){
+  var arr[];
+  for (var i=0; i<3;i++){
+    arr.push(function(){  // we create a function object but don't execute it
+      console.log(i);
+    })
+  }
+  return arr;
+}
+
+// create EC buildFunctions() with i=3 and arr=[function, function, function]
+// once execution done remove EC buildFunctions() but keep variables (closure)
+var fs = buildFunctions();
+
+// look for i in the scope chain which is the outer environment created by EC
+// buildFunctions() where i=3
+fs[0](); // 3  
+fs[1](); // 3
+fs[2](); // 3
+
+```
+
+It is like asking children the age of their parents. They won't awnser relative to their own age but they will anwser with the context of their parents which will be the same for all the children.
+
+To fix that :
+``` let j = i;  
+```
+
+ES6 creates a new memory spot for j everytimes is called.
+
+Or called the function immediately with IIFE
+
+### Function Factory and Closure
+
+```javascript
+function makeGreeting(language){ //Factory
+  return function(firstName, lastName){
+    if (language==='en'){
+      console.log('Hello');
+    }
+    if (language==='es'){
+      console.log('Hola');
+    }
+    console.log(firstName + ' ' + lastName);
+  }
+}
+
+var greetEnglish = makeGreeting('en'); // one EC with language = 'en'
+var greetSpanish = makeGreeting('es'); // one EC with language = 'es'
+
+greetEnglish('john', 'doe'); // Hello john doe
+greetSpanish('john', 'doe'); // Hola john doe
+```
