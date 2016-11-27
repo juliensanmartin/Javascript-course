@@ -332,7 +332,8 @@ Callback function : a function you give to another function to be run when the o
 
 So the function you call (invoke) call back by calling the function you gave it when it finishes.
 
-``` function tellMeWhenDone(callback){
+```javascript
+ function tellMeWhenDone(callback){
   // some code
   callback();
 }
@@ -473,3 +474,130 @@ String.prototype.isLenghtGreaterThan = function (){
   ...
 }
 ```   
+
+### Object.create : Pure Prototypal Inheritance
+
+```javascript
+var person = {
+  firstName:'default',
+  lastName:'default',
+  greet:function(){
+    return 'Hi'+ this.firstName + this.lastName;
+  }
+}
+
+var john = Object.create(person); // create an empty object with prototype is the object passed in parameters
+john.lastName='Doe';
+
+```
+
+### Polyfill: Code that adds a feature which the Engine may lack, adopt to older browser.
+
+```javascript
+if (!Object.create){
+  Obejct.create = function(o){
+    ...
+  }
+  function F(){};
+  F.prototype=o; // point prototype to new empty object
+  return new F(); // create a new object
+}
+
+```
+
+### ES6 and Classes
+
+```javascript
+class Person extends ...{ //extends to setup prototype, class is an object
+  constructor (firstName, lastName){
+    this.firstName=firstName;
+    ...
+    super (...); //if extends
+  }
+
+  greet(){
+    return 'Hi' + firstName;
+  }
+}
+
+var john = new Person('john', 'doe');
+```
+
+### Method chaining
+
+```javascript
+var q= $('ul.poeple').addClass('numClass').removeClass(poeple); //JQuery
+```
+
+How to do that? => finish with `return this` to allow method chaining
+
+### Write a library
+`var g= G$(firstName, lastName, language);` => usage of our library (no use of `new`)
+
+
+```javascript
+(function(global, $){ // secure the code
+  //Initialise the object
+  var Greetr = function(firstName, lastName, language){ //wrap the construction of new object then the user won't have to do it himself
+    return new Greetr.init(firstName, lastName, language); //avoid the use of the 'new' keyword
+  }
+
+  Greetr.prototype = {}; //empty the prototype
+
+  Greetr.init=function(firstName, lastName, language){ //create the object
+    // build the object with this
+  }
+
+  Greetr.init.prototype=Greetr.prototype; // point the prototype of Greetr.init to Greetr prototype, Greetr and Greetr.init are the same
+
+  global.Greetr = global.G$ = Greetr; // export the value of Greetr or G$ to the global scope
+}(windows,$));
+```
+
+#### properties and chaining method
+To save memory methods will go to prototype
+
+If we add a variable (`supportedLang`) inside the main function (file), the variable will be accessible by `Greetr.init` because `Greetr.init` lexical environment is the whole function(file) thanks to `Closure`. But the variable won't be accessible to the outside.
+
+```javascript
+(function(global, $){ // secure the code
+  //Initialise the object
+  var Greetr = function(firstName, lastName, language){ //wrap the construction of new object then the user won't have to do it himself
+    return new Greetr.init(firstName, lastName, language); //avoid the use of the 'new' keyword
+  }
+
+  var supportedLang = ['en', 'es'];
+
+  Greetr.prototype = {}; //empty the prototype
+
+  Greetr.init=function(firstName, lastName, language){ //create the object
+    // build the object with this
+  }
+
+  Greetr.prototype={
+    fullName:function(){
+      return this.firstName + this.lastName;
+    }
+
+    greet: function(formal){
+      var msg;
+      if (formal){
+        msg=...
+      }else{
+        ...
+      }
+      return this; // for function chaining, returns from the object calling in this case this=Greetr
+      // can be use like G$.greet().greet(true).setLang('es').greet();
+    }
+
+    setLang(language){
+      this.language=language;
+      return this; // will work thanks to closure + function chaining
+    }
+  }
+
+  Greetr.init.prototype=Greetr.prototype; // point the prototype of Greetr.init to Greetr prototype, Greetr and Greetr.init are the same
+
+  global.Greetr = global.G$ = Greetr; // export the value of Greetr or G$ to the global scope
+}(windows,$));
+```
