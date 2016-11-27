@@ -326,3 +326,150 @@ var greetSpanish = makeGreeting('es'); // one EC with language = 'es'
 greetEnglish('john', 'doe'); // Hello john doe
 greetSpanish('john', 'doe'); // Hola john doe
 ```
+
+### Closures and callback
+Callback function : a function you give to another function to be run when the other function finishes
+
+So the function you call (invoke) call back by calling the function you gave it when it finishes.
+
+``` function tellMeWhenDone(callback){
+  // some code
+  callback();
+}
+
+tellMeWhenDone(function () {
+  console.log('huhu');
+  })
+```
+
+### call(), apply(), bind(): control this
+
+function :
+1. code
+2. name (optional)
+3. call()
+4. apply()
+5. bind()
+
+```javascript
+var person = {
+  firstName = 'John',
+  lastName = 'Doe',
+  getFullName: function(){
+    var fullName = this.firstName + ' ' + this.lastName;
+    return fullName;
+  }
+}
+
+var logName = function(greeting){
+  console.log(greeting + this.getFullName()) // won't work of course
+}.bind(person) // now will works
+
+var logPersonName = logName.bind(person); //will work, creates a copy of this
+
+logName(); //without the bind => error
+logPersonName(); //works
+
+logName.call(person, param...); //call control who is this and executes
+
+logName.apply(person, [...]); //like call but uses an array
+```
+
+### function Borrowing
+```javascript
+person2 = {...}
+person.getFullName.apply(person2);
+```
+
+### function Currying
+```javascript
+function multiply(a, b){
+  return a*b;
+}
+
+var multiplyByTwo = multiply.bind(this, 2); //a=2
+
+multiplyByTwo(4); // 8, b=4
+```
+
+*Function Currying* Create a copy of a function but with some preset parameters.
+
+###Functional programming
+```javascript
+var arr1=[1,2,3];
+var arr2=[];
+
+for (var i=0, i<arr1, i++){
+  arr2.push(arr1[i]*2);
+}
+
+function mapForEach(arr, fn){
+  var new Arr=[];
+  for (...){
+    newArr.push(fn(arr1));
+  }
+}
+
+var arr2= mapForEach(arr1, function(item){
+  return item*2;
+})
+
+```
+Build cleaner code,
+Focus on minimum responsabilty for each function
+
+```javascript
+var checkPastLimit = function(limiter, item){ // 2 arguments but fn just accept 1
+  return item > limiter;
+}
+
+var arr2 = mapForEach(arr1, checkPastLimit.bind(this,1));
+// good but need to use bind
+
+var checkPastLimitsimplified= function (limiter){
+  return function (limiter, item){ // returns a function. creates a function object but
+    return item > limiter;         // don't execute!!!
+  }.bind(this, limiter); //currying, preset parameter
+}
+
+var arr3 = mapForEach(arr1, checkPastLimitsimplified(2));
+```
+
+### Pattern : How to give functions to functions, how to return functions object. Split code in more smaller part.
+
+### The tiniest function must try not to mutate data better to return something new
+
+### Object oriented JS & Prototypal Inheritance
+Inheritance: One object get access to the properties and methods of another object
+
+Prototypal Inheritance: flexible, extensible, easy to understand
+
+### Everything is Js is an Object (or a Primitive)
+
+### How to set prototype?
+Function
+-> code
+-> name
+-> `.prototype` // always use with `new` or as function constructor
+
+```javascript
+
+var john = new Person();
+
+Person.prototype.getFullName = function(){ // point to `--proto--`
+  ...
+}
+
+```
+
+usually `properties` in the object and `method` in the `.prototype`
+for efficiency reason (less memory used) => only need one method for all the objects created.
+
+### !!! Never forgot new with function constructor because it's  function that returns nothing so the call of the function will be undefined
+
+Possible to add features to s build-in to enhance JS :
+```javascript
+String.prototype.isLenghtGreaterThan = function (){
+  ...
+}
+```   
